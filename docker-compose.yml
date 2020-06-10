@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+
+  rabbitmq:
+    image: 'rabbitmq:3.7-management-alpine'
+    restart: always
+    ports:
+      - '22200:15672'
+    networks:
+      - network
+    environment:
+      RABBITMQ_DEFAULT_USER: '${RABBITMQ_USER}'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_PASS}'
+
+  redis:
+    image: 'redis'
+    restart: always
+    ports:
+      - '22203:6379'
+    networks:
+      - network
+    sysctls:
+        net.core.somaxconn: 4096
+    command: "redis-server --databases 1"
+
+  consul:
+    image: 'consul:latest'
+    restart: always
+    ports:
+      - '22210:8500'
+    networks:
+      - network
+    command: "agent -server -ui -client 0.0.0.0 -bootstrap-expect 1"
+
+  base-service-template: &base_service
+    build: &base_service-build
+      context: .
+      dockerfile: ./_common/Dockerfile
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        APP_NAME: _common
+    image: '${PROJECT_NAME}-base-service-template:${VERSION}'
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'sleep 100000000'"
+    env_file:
+      - .env
+    cap_add:
+      - SYS_PTRACE
+    restart: always
+    tty: true
+    stdin_open: true
+    ipc: host
+    networks:
+      - network
+    depends_on:
+      - redis
+      - consul
+      - rabbitmq
+    volumes:
+      - /tmp/${PROJECT_NAME}:/tmp/${PROJECT_NAME}
+      - /data/${PROJECT_NAME}:/data/${PROJECT_NAME}
+
+  pong:
+    <<: *base_service
+    build:
+      <<: *base_service-build
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        APP_NAME: pong
+    image: '${PROJECT_NAME}-pong:${VERSION}'
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-py3/bin/activate && sleep 8 && exec python daemon.py'"
+
+  ping:
+    <<: *base_service
+    build:
+      <<: *base_service-build
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        APP_NAME: ping
+    image: '${PROJECT_NAME}-ping:${VERSION}'
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-pypy3/bin/activate && sleep 10 && exec python daemon.py'"
+    environment:
+      NAMEKO_MAX_WORKERS: 500
+
+networks:
+  network: {}

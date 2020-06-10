@@ -1,0 +1,16 @@
+AMQP_URI: !env_var "py${AMQP_URI}"
+WEB_SERVER_ADDRESS: '0.0.0.0:8000'
+rpc_exchange: 'nameko-rpc'
+serializer: ${NAMEKO_SERIALIZER:pickle}
+max_workers: ${NAMEKO_MAX_WORKERS:1}
+parent_calls_tracked: 10
+
+
+LOGGING:
+    version: 1
+    handlers:
+        console:
+            class: logging.StreamHandler
+    root:
+        level: !env_var "${LOGGING_LEVEL}"
+        handlers: [console]

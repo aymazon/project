@@ -1,0 +1,17 @@
+pysnooper
+pprofile
+six
+pyrsistent
+fn
+toolz
+functoolsex
+psutil
+retrying
+requests
+pyro4
+pika
+pykka
+redis
+python-redis-lock
+nameko<3.0
+python-consul
