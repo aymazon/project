@@ -77,5 +77,5 @@ class Service(ServiceBase):
 
         threading.Thread(target=kill_self, daemon=True).start()
 
-    def dev_ping(self, i):
-        return f"pong {i}"
+    def dev_ping(self, i: int, src: str):
+        return f"pong {i} from {src}"

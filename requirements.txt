@@ -18,3 +18,8 @@ redis
 python-redis-lock
 nameko<3.0
 python-consul
+greenlet
+eventlet
+gunicorn[eventlet]
+flask
+flask-restful

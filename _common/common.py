@@ -549,7 +549,13 @@ def start_rpc_agent(cls: object) -> None:
                      daemon=True).start()
 
 
-_g_consul: t.Optional[consul.Consul] = None
+_g_consul: consul.Consul = None
+
+
+def create_g_consult():
+    global _g_consul
+    assert _g_consul is None
+    _g_consul = consul.Consul(host=os.environ['CONSUL_HOST'])
 
 
 @global_call_only_once
@@ -557,8 +563,7 @@ def start_consul_agent(service_name: str = os.environ['APP_NAME'],
                        address: str = get_host_ip(),
                        timeout: int = 10) -> None:
     """ Start consul agent server """
-    global _g_consul
-    _g_consul = consul.Consul(host=os.environ['CONSUL_HOST'])
+    create_g_consult()
     service_id = f"{service_name}:{os.environ['PROC_INDEX']}"
     port = RPC_SERVICE_BASE_PORT + int(os.environ['PROC_INDEX'])
 
@@ -589,8 +594,6 @@ def start_consul_agent(service_name: str = os.environ['APP_NAME'],
 
 def get_health_service_ids(service_name: str) -> t.List[str]:
     """ get health service ids from consul """
-    global _g_consul
-    assert _g_consul
     index, nodes = _g_consul.health.service(service_name, passing=True)
     ids = []
     for node in nodes:
@@ -608,8 +611,6 @@ def get_health_service_rpc_proxy(
         service_name: str,
         id_: t.Optional[str] = None) -> t.Optional[Pyro4.Proxy]:
     """ get health service from consul and make a rpc_rpoxy """
-    global _g_consul
-    assert _g_consul
     _, nodes = _g_consul.health.service(service_name, passing=True)
     if not nodes:
         return None

@@ -82,5 +82,19 @@ services:
     environment:
       NAMEKO_MAX_WORKERS: 500
 
+  duang:
+    <<: *base_service
+    build:
+      <<: *base_service-build
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        APP_NAME: duang
+    image: '${PROJECT_NAME}-duang:${VERSION}'
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-pypy3/bin/activate && sleep 10 && exec gunicorn -b 0.0.0.0:9000 -k eventlet --worker-connections=1000 -w 3 service:app -n duang'"
+    environment:
+      NAMEKO_MAX_WORKERS: 500
+    ports:
+      - '22220:9000'
+
 networks:
   network: {}
