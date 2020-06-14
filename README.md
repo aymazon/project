@@ -14,13 +14,14 @@ sudo apt-get install -y nvidia-container-runtime
 #  "default-runtime": "nvidia"
 ```
 
-## 全局替换 project 为工程名称
+## 全局替换 project 为工程名称(注意只替换小写的即可)
 
 1. `_common/Dockerfile`
 
 ## 基础镜像本地构建
 ```bash
-# 当然也可以直接使用 baseimage 基础镜像
+# 当然也可以直接使用 baseimage 基础镜像(根目录下的Dockerfile文件头, 默认不使用 GPU 版本)
+# 如果使用 GPU 版本执行下面
 git clone https://github.com/phusion/baseimage-docker.git  # 注意 baseimage-docker 主仓版本号和项目 Dockerfile 的版本对应
 cd baseimage-docker
 vim image/prepare.sh
@@ -31,7 +32,8 @@ sed -i 's/http:\/\/security\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/u
 make build BASE_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04 NAME=phusion/baseimage-cuda-10.0-cudnn7-devel-ubuntu18.04 QEMU_ARCH=amd64
 cd -
 mkdir tmp
-wget -q https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.3.0-linux64.tar.bz2 -O tmp/pypy3.tar.bz2
+wget -q https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.3.1-linux64.tar.bz2 -O tmp/pypy3.tar.bz2
+# 如果使用 GPU 版本, build 下面前注意修改根目录下的 Dockerfile 头为刚编译的镜像 NAME, 否则使用当前默认值
 docker build --no-cache -t project/baseimage:0.1 .
 ```
 
