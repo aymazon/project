@@ -68,7 +68,7 @@ services:
         PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: pong
     image: '${PROJECT_NAME}-pong:${VERSION}'
-    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-py3/bin/activate && sleep 8 && exec python daemon.py'"
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-py3/bin/activate && sleep 8 && exec python daemon.py --app-name=pong'"
 
   ping:
     <<: *base_service
@@ -78,7 +78,7 @@ services:
         PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: ping
     image: '${PROJECT_NAME}-ping:${VERSION}'
-    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-pypy3/bin/activate && sleep 10 && exec python daemon.py'"
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'source /venv-pypy3/bin/activate && sleep 10 && exec python daemon.py --app-name=ping'"
     environment:
       NAMEKO_MAX_WORKERS: 500
 

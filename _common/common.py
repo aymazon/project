@@ -607,13 +607,22 @@ _g_rpc_proxys_lock = threading.Lock()
 
 
 @lru_cache_time(seconds=1)
-def get_health_service_rpc_proxy(
-        service_name: str,
-        id_: t.Optional[str] = None) -> t.Optional[Pyro4.Proxy]:
-    """ get health service from consul and make a rpc_rpoxy """
+def get_health_service_rpc_proxy(service_name: str,
+                                 id_: t.Optional[str] = None) -> Pyro4.Proxy:
+    """Gets health service from consul and make a rpc_rpoxy.
+
+    Args:
+        service_name: Which RPC service.
+        id_: A service id, if it is provided, return the handle of this service.
+    Return:
+        A Pyro4 proxy.
+    Raises:
+        LookupError:
+            It is thrown when cannot find a valid service.
+    """
     _, nodes = _g_consul.health.service(service_name, passing=True)
     if not nodes:
-        return None
+        raise LookupError(f"Cannot get health nodes.")
 
     if id_ is None:
         node = random.choice(nodes)
@@ -622,7 +631,7 @@ def get_health_service_rpc_proxy(
             if id_ == node["Service"]["ID"].split(':')[1]:
                 break
         else:
-            return None
+            raise LookupError(f"Cannot find the service by id {id_}.")
 
     ipv4 = node["Service"]["TaggedAddresses"]["lan_ipv4"]
     uri = (f'PYRO:{service_name}_{node["Service"]["ID"].split(":")[1]}'
