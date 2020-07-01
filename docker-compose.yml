@@ -41,7 +41,7 @@ services:
         PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: _common
     image: '${PROJECT_NAME}-base-service-template:${VERSION}'
-    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'sleep 100000000'"
+    command: "/sbin/my_init --skip-startup-files --skip-runit --quiet -- bash -c 'sleep 10000000000'"
     env_file:
       - .env
     cap_add:

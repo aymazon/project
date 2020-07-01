@@ -5,7 +5,7 @@ from common import PROJECT_NAME, APP_NAME, LOGGER, ServiceBase  # noqa
 import traceback
 import Pyro4
 
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_restful import Resource, Api
 
 from common import create_g_consult, get_health_service_rpc_proxy
@@ -13,7 +13,8 @@ from common import create_g_consult, get_health_service_rpc_proxy
 create_g_consult()
 
 app = Flask(__name__)
-api = Api(app)
+api_bp = Blueprint('api', __name__)
+api = Api(api_bp)
 
 
 class HelloWorld(Resource):
@@ -28,3 +29,4 @@ class HelloWorld(Resource):
 
 
 api.add_resource(HelloWorld, '/')
+app.register_blueprint(api_bp)
