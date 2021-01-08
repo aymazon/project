@@ -16,10 +16,10 @@ pika
 pykka
 redis
 python-redis-lock
+eventlet<0.24
 nameko<3.0
 python-consul
 greenlet
-eventlet
-gunicorn[eventlet]
+gunicorn[eventlet]<19.10
 flask
 flask-restful

@@ -499,7 +499,7 @@ def start_process(index: int) -> subprocess.Popen:
     """ Start a subprocess by nameko """
     cmd = [
         'nameko', 'run', '--config',
-        f'/app/{PROJECT_NAME}_{APP_NAME}_service.yml', f"service"
+        f'/app/{PROJECT_NAME}_{APP_NAME}_service.yml', "service"
     ]
     LOGGER.info(f"{PROJECT_NAME}_{APP_NAME} [{index}] start")
 
@@ -622,7 +622,7 @@ def get_health_service_rpc_proxy(service_name: str,
     """
     _, nodes = _g_consul.health.service(service_name, passing=True)
     if not nodes:
-        raise LookupError(f"Cannot get health nodes.")
+        raise LookupError("Cannot get any health nodes.")
 
     if id_ is None:
         node = random.choice(nodes)
