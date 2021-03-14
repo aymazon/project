@@ -20,11 +20,15 @@ import shutil
 
 from functools import partial, wraps, total_ordering, lru_cache, update_wrapper
 
+import yaml
+
 import consul
 import redis
 import redis_lock
 
 from nameko.timer import timer
+from nameko.standalone.rpc import ClusterRpcProxy
+from nameko.cli.main import setup_yaml_parser
 import Pyro4
 
 PROJECT_NAME = os.environ['PROJECT_NAME']
@@ -600,6 +604,28 @@ def get_health_service_ids(service_name: str) -> t.List[str]:
         ids.append(node["Service"]["ID"].split(':')[1])
 
     return ids
+
+
+@global_call_only_once
+def get_nameko_config():
+    setup_yaml_parser()
+    config_path: str = f'/app/{PROJECT_NAME}_{APP_NAME}_service.yml'
+    assert os.path.exists(config_path)
+    with open(config_path) as f:
+        return yaml.unsafe_load(f)
+
+
+def make_service_proxy() -> ClusterRpcProxy:
+    """ Make a new nameko ClusterRpcProxy
+    with make_service_proxy() as service_proxy:
+        service_proxy.service_x.remote_method("hell")
+        hello_res = service_proxy.service_x.remote_method.call_async("hello")
+        world_res = service_proxy.service_x.remote_method.call_async("world")
+        # do work while waiting
+        hello_res.result()  # "hello-x-y"
+        world_res.result()  # "world-x-y"
+    """
+    return ClusterRpcProxy(get_nameko_config())
 
 
 _g_rpc_proxys: t.Dict[str, Pyro4.Proxy] = {}

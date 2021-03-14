@@ -65,4 +65,4 @@ class Service(ServiceBase):
     @timer(interval=1.1)
     def dev_ping(self):
         rpc_proxy = get_health_service_rpc_proxy('pong')
-        LOGGER.info(rpc_proxy.dev_ping(1, src='ping'))
+        LOGGER.info(rpc_proxy.dev_pyro4_ping(1, src='ping'))

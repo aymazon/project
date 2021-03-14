@@ -69,7 +69,7 @@ class Service(ServiceBase):
         xxx_id = event_data['xxx_id']
         if xxx_id != g_processing_xxx_id:
             return
-        LOGGER.info(f"stop self")
+        LOGGER.info("stop self")
 
         def kill_self() -> None:
             time.sleep(0.1)
@@ -77,5 +77,9 @@ class Service(ServiceBase):
 
         threading.Thread(target=kill_self, daemon=True).start()
 
-    def dev_ping(self, i: int, src: str):
-        return f"pong {i} from {src}"
+    @rpc
+    def dev_nameko_ping(self, i: int, src: str):
+        return f"pong {i} from {src} by nameko"
+
+    def dev_pyro4_ping(self, i: int, src: str):
+        return f"pong {i} from {src} by Pyro4"

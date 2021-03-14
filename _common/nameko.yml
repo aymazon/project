@@ -1,7 +1,7 @@
 AMQP_URI: !env_var "py${AMQP_URI}"
 WEB_SERVER_ADDRESS: '0.0.0.0:8000'
-rpc_exchange: 'nameko-rpc'
-serializer: ${NAMEKO_SERIALIZER:pickle}
+rpc_exchange: 'nameko-rpc-${PROJECT_NAME}'
+serializer: ${NAMEKO_SERIALIZER:msgpack}
 max_workers: ${NAMEKO_MAX_WORKERS:1}
 parent_calls_tracked: 10
 
