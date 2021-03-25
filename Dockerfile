@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.11
+FROM phusion/baseimage:18.04-1.0.0
 
 CMD ["/sbin/my_init"]
 
@@ -8,8 +8,8 @@ ENV LANG C.UTF-8
 
 RUN set -ex; \
     true \
-    && sed -i 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/ubuntu\//g' /etc/apt/sources.list \
-    && sed -i 's/http:\/\/security\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/ubuntu\//g' /etc/apt/sources.list \
+    && sed -i 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.aliyun\.com\/ubuntu\//g' /etc/apt/sources.list \
+    && sed -i 's/http:\/\/security\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.aliyun\.com\/ubuntu\//g' /etc/apt/sources.list \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y -q --no-install-recommends \
@@ -24,7 +24,7 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY requirements.txt /tmp
 
 RUN set -ex; true \
-    && mkdir -p ~/.pip && echo -e "[global]\nindex-url = https://mirrors.163.com/pypi/simple" > ~/.pip/pip.conf \
+    && mkdir -p ~/.pip && echo -e "[global]\nindex-url = https://mirrors.aliyun.com/pypi/simple" > ~/.pip/pip.conf \
     && virtualenv -p python3 --no-setuptools --system-site-packages /venv-py3 \
     && echo -e "alias activate-py3='source /venv-py3/bin/activate'\n" >> /root/.bashrc \
     && source /venv-py3/bin/activate \

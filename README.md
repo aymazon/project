@@ -32,7 +32,7 @@ sed -i 's/http:\/\/security\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/u
 make build BASE_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04 NAME=phusion/baseimage-cuda-10.0-cudnn7-devel-ubuntu18.04 QEMU_ARCH=amd64
 cd -
 mkdir tmp
-wget -q https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.3.1-linux64.tar.bz2 -O tmp/pypy3.tar.bz2
+wget -q https://downloads.python.org/pypy/pypy3.6-v7.3.3-linux64.tar.bz2 -O tmp/pypy3.tar.bz2
 # 如果使用 GPU 版本, build 下面前注意修改根目录下的 Dockerfile 头为刚编译的镜像 NAME, 否则使用当前默认值
 docker build --no-cache -t project/baseimage:0.1 .
 ```
