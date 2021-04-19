@@ -33,8 +33,7 @@ class Service(ServiceBase):
     def start_pong(self, xxx_id: int) -> None:
         global g_processing_xxx_id
         r = get_redis_client()
-        processing_key = (
-            f"{PROJECT_NAME}.{APP_NAME}.xxx.is_processing.{xxx_id}")
+        processing_key = (f"{PROJECT_NAME}.{APP_NAME}.xxx.is_processing.{xxx_id}")
         if r.get(processing_key) == '1':
             LOGGER.info(f"ignore processing xxx {xxx_id}")
             return
@@ -60,10 +59,7 @@ class Service(ServiceBase):
 
         # threading.Thread(target=start, daemon=True).start()
 
-    @event_handler("ping",
-                   "stop_pong",
-                   handler_type=BROADCAST,
-                   reliable_delivery=False)
+    @event_handler("ping", "stop_pong", handler_type=BROADCAST, reliable_delivery=False)
     def handle_stop_pong_event(self, event_data: t.Dict[str, t.Any]) -> None:
         global g_processing_xxx_id
         xxx_id = event_data['xxx_id']

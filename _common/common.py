@@ -35,9 +35,7 @@ PROJECT_NAME = os.environ['PROJECT_NAME']
 APP_NAME = os.environ['APP_NAME']
 
 
-def cprofile_print_stats(max_call_num: int = 1,
-                         step: int = 1,
-                         sort_key: int = 2):
+def cprofile_print_stats(max_call_num: int = 1, step: int = 1, sort_key: int = 2):
     """ cprofile print stats
     Args:
         sort_key: {-1: "stdname", 0: "calls", 1: "time", 2: "cumulative"}
@@ -80,8 +78,7 @@ def cprofile_print_stats(max_call_num: int = 1,
     return wrapper
 
 
-def _pprofile_dump(prof: pprofile.Profile, file_path: str,
-                   need_rmtree) -> None:
+def _pprofile_dump(prof: pprofile.Profile, file_path: str, need_rmtree) -> None:
     def _pprofile_copy_files() -> None:
         name: str
         for name, lines in prof.iterSource():
@@ -131,9 +128,7 @@ def pprofile_dump_stats(max_call_num: int = 1, step: int = 1):
             print(print_title)
             print('-' * 100)
             print('')
-            _pprofile_dump(
-                prof, f"/tmp/{PROJECT_NAME}/pp/cachegrind.out.{call_num}",
-                call_num == 1)
+            _pprofile_dump(prof, f"/tmp/{PROJECT_NAME}/pp/cachegrind.out.{call_num}", call_num == 1)
             return result
 
         return inner_wrapper
@@ -159,9 +154,7 @@ def pprofile_dump_statistical_stats(max_call_num: int = 1, step: int = 1):
             call_num = int(r.get(key))
             if call_num > max_call_num or (call_num - 1) % step != 0:
                 return func(*args, **kwargs)
-            print_title = (
-                ' ' * 30 +
-                f'-*-pprofile_print_statistical_stats-*-|{call_num}')
+            print_title = (' ' * 30 + f'-*-pprofile_print_statistical_stats-*-|{call_num}')
 
             prof = pprofile.StatisticalProfile()
             with prof(period=0.001, single=True):
@@ -170,9 +163,7 @@ def pprofile_dump_statistical_stats(max_call_num: int = 1, step: int = 1):
             print(print_title)
             print('-' * 100)
             print('')
-            _pprofile_dump(
-                prof, f"/tmp/{PROJECT_NAME}/pp/cachegrind.out.{call_num}",
-                call_num == 1)
+            _pprofile_dump(prof, f"/tmp/{PROJECT_NAME}/pp/cachegrind.out.{call_num}", call_num == 1)
             return result
 
         return inner_wrapper
@@ -208,8 +199,7 @@ class Singleton(type):
     @synchronized(_g_singleton_type_lock)  # type: ignore
     def _locked_call(cls, *args, **kwargs):  # type: ignore
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton,
-                                        cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
 
 
 _g_singleton_actor_proxy_type_lock = threading.RLock()
@@ -223,8 +213,7 @@ class SingletonActorProxy(type):
     def __call__(cls, *args, **kwargs):  # type: ignore
         if cls not in cls._instances:
             if cls._instance_creating:
-                return super(SingletonActorProxy,
-                             cls).__call__(*args, **kwargs)
+                return super(SingletonActorProxy, cls).__call__(*args, **kwargs)
             cls._locked_call(*args, **kwargs)
         return cls._instances[cls]['proxy']
 
@@ -256,9 +245,7 @@ def global_call_only_once(func):
     return wrapper
 
 
-def update_logging(log_file_path: str,
-                   log_level: str = 'DEBUG',
-                   expand_str: str = '') -> None:
+def update_logging(log_file_path: str, log_level: str = 'DEBUG', expand_str: str = '') -> None:
     assert log_file_path
     LOG_LEVEL = {
         '': 10,
@@ -273,10 +260,8 @@ def update_logging(log_file_path: str,
         if not os.path.exists(os.path.dirname(log_file_path)):
             os.makedirs(os.path.dirname(log_file_path))
 
-    proc_name = os.environ['PROC_ID'] if os.environ.get(
-        'PROC_ID') else APP_NAME
-    default_format = ('%(asctime)s %(levelname)-7s %(name)-10s ' + proc_name +
-                      ' %(filename)-20s %(lineno)-4s ')
+    proc_name = os.environ['PROC_ID'] if os.environ.get('PROC_ID') else APP_NAME
+    default_format = ('%(asctime)s %(levelname)-7s %(name)-10s ' + proc_name + ' %(filename)-20s %(lineno)-4s ')
     default_format += expand_str
     default_format += ' - %(message)s'
 
@@ -367,8 +352,7 @@ def lazy(func, *resultclasses):
             self.__prepared = True
 
         def __reduce__(self):
-            return (_lazy_proxy_unpickle,
-                    (func, self.__args, self.__kw) + resultclasses)
+            return (_lazy_proxy_unpickle, (func, self.__args, self.__kw) + resultclasses)
 
         def __repr__(self):
             return repr(self.__cast())
@@ -386,8 +370,8 @@ def lazy(func, *resultclasses):
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = str in resultclasses
-            assert not (cls._delegate_bytes and cls._delegate_text), (
-                "Cannot call lazy() with both bytes and text return types.")
+            assert not (cls._delegate_bytes
+                        and cls._delegate_text), ("Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
                 cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
@@ -501,10 +485,7 @@ def get_host_ip() -> str:
 
 def start_process(index: int) -> subprocess.Popen:
     """ Start a subprocess by nameko """
-    cmd = [
-        'nameko', 'run', '--config',
-        f'/app/{PROJECT_NAME}_{APP_NAME}_service.yml', "service"
-    ]
+    cmd = ['nameko', 'run', '--config', f'/app/{PROJECT_NAME}_{APP_NAME}_service.yml', "service"]
     LOGGER.info(f"{PROJECT_NAME}_{APP_NAME} [{index}] start")
 
     env = os.environ.copy()
@@ -542,15 +523,8 @@ RPC_SERVICE_BASE_PORT = 8500
 def start_rpc_agent(cls: object) -> None:
     """ Start Pyro4 daemon server """
     ar = ({cls: os.environ["PROC_ID"]}, )
-    kw = {
-        'host': get_host_ip(),
-        'port': RPC_SERVICE_BASE_PORT + int(os.environ['PROC_INDEX']),
-        'ns': False
-    }
-    threading.Thread(target=Pyro4.Daemon.serveSimple,
-                     args=ar,
-                     kwargs=kw,
-                     daemon=True).start()
+    kw = {'host': get_host_ip(), 'port': RPC_SERVICE_BASE_PORT + int(os.environ['PROC_INDEX']), 'ns': False}
+    threading.Thread(target=Pyro4.Daemon.serveSimple, args=ar, kwargs=kw, daemon=True).start()
 
 
 _g_consul: consul.Consul = None
@@ -573,12 +547,11 @@ def start_consul_agent(service_name: str = os.environ['APP_NAME'],
 
     while True:
         try:
-            _g_consul.agent.service.register(
-                service_name,
-                service_id=service_id,
-                address=get_host_ip(),
-                port=port,
-                check=consul.Check.ttl(f'{timeout}s'))
+            _g_consul.agent.service.register(service_name,
+                                             service_id=service_id,
+                                             address=get_host_ip(),
+                                             port=port,
+                                             check=consul.Check.ttl(f'{timeout}s'))
             break
         except (ConnectionError, consul.ConsulException):
             LOGGER.warning('consul host is down, reconnecting...')
@@ -633,8 +606,7 @@ _g_rpc_proxys_lock = threading.Lock()
 
 
 @lru_cache_time(seconds=1)
-def get_health_service_rpc_proxy(service_name: str,
-                                 id_: t.Optional[str] = None) -> Pyro4.Proxy:
+def get_health_service_rpc_proxy(service_name: str, id_: t.Optional[str] = None) -> Pyro4.Proxy:
     """Gets health service from consul and make a rpc_rpoxy.
 
     Args:
@@ -660,8 +632,7 @@ def get_health_service_rpc_proxy(service_name: str,
             raise LookupError(f"Cannot find the service by id {id_}.")
 
     ipv4 = node["Service"]["TaggedAddresses"]["lan_ipv4"]
-    uri = (f'PYRO:{service_name}_{node["Service"]["ID"].split(":")[1]}'
-           f'@{ipv4["Address"]}:{ipv4["Port"]}')
+    uri = (f'PYRO:{service_name}_{node["Service"]["ID"].split(":")[1]}' f'@{ipv4["Address"]}:{ipv4["Port"]}')
 
     if uri not in _g_rpc_proxys:
         with _g_rpc_proxys_lock:
@@ -678,8 +649,7 @@ _g_redis_client: t.Optional[redis.Redis] = None
 def get_redis_client() -> redis.Redis:
     """ Get the global redis client """
     global _g_redis_client
-    _g_redis_client = redis.Redis.from_url(os.environ['REDIS_URI'],
-                                           decode_responses=True)
+    _g_redis_client = redis.Redis.from_url(os.environ['REDIS_URI'], decode_responses=True)
     setattr(_g_redis_client, 'Lock', partial(redis_lock.Lock, _g_redis_client))
     return _g_redis_client
 

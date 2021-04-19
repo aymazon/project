@@ -26,14 +26,10 @@ class Service(ServiceBase):
 
     pong = RpcProxy("pong", delivery_mode=NON_PERSISTENT)
 
-    @event_handler("pong",
-                   "processed",
-                   handler_type=BROADCAST,
-                   reliable_delivery=False)
+    @event_handler("pong", "processed", handler_type=BROADCAST, reliable_delivery=False)
     def handle_processed_event(self, event_data: t.Dict[str, t.Any]) -> None:
         r = get_redis_client()
-        processing_key = (f"{PROJECT_NAME}.{APP_NAME}.is_processing."
-                          f"{event_data['xxx_id']}")
+        processing_key = (f"{PROJECT_NAME}.{APP_NAME}.is_processing." f"{event_data['xxx_id']}")
         with r.Lock(f"{processing_key}-lock", expire=5):
             key_num = r.get(processing_key)
             if key_num is None:

@@ -8,8 +8,7 @@ import Pyro4
 from flask import Flask, Blueprint
 from flask_restful import Resource, Api
 
-from common import (create_g_consult, get_health_service_rpc_proxy,
-                    make_service_proxy)
+from common import (create_g_consult, get_health_service_rpc_proxy, make_service_proxy)
 
 create_g_consult()
 
